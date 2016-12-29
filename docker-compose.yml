@@ -1,0 +1,26 @@
+app:
+  image: rails5_alpine:latest
+  environment:
+    - DATABASE_URL=postgres://user:mypass@postgres
+    - REDIS_URL=redis://redis
+  links:
+    - redis:redis
+    - db:db
+  volumes:
+    - ./:/app/
+
+sidekiq:
+  image: rails5_alpine:latest
+  environment:
+    - REDIS_URL=redis://redis
+  links:
+    - redis:redis
+  command: bundle exec sidekiq
+
+redis:
+  image: redis:latest
+
+db:
+  image: postgres:latest
+  environment:
+    - POSTGRES_PASSWORD=mypass
