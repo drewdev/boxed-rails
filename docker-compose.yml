@@ -1,26 +1,42 @@
-app:
-  image: rails5_alpine:latest
-  environment:
-    - DATABASE_URL=postgres://user:mypass@postgres
-    - REDIS_URL=redis://redis
-  links:
-    - redis:redis
-    - db:db
-  volumes:
-    - ./:/app/
+version: '2.1'
+services:
+  app:
+    image: rails_alpine:latest
+    environment:
+      - DATABASE_URL=postgres://user:mypass@postgres
+      - REDIS_URL=redis://redis
+    links:
+      - redis:redis
+      - db:db
+    volumes:
+      - app-src:/src
+    working_dir: /src/app
 
-sidekiq:
-  image: rails5_alpine:latest
-  environment:
-    - REDIS_URL=redis://redis
-  links:
-    - redis:redis
-  command: bundle exec sidekiq
+  sidekiq:
+    image: rails5_alpine:latest
+    environment:
+      - REDIS_URL=redis://redis
+    links:
+      - redis:redis
+    volumes:
+      - app-src:/src
+    working_dir: /src/app
+    command: bundle exec sidekiq
 
-redis:
-  image: redis:latest
+  redis:
+    image: redis:latest
+    volumes:
+      - redis-data:/var/lib/redis
 
-db:
-  image: postgres:latest
-  environment:
-    - POSTGRES_PASSWORD=mypass
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_PASSWORD=mypass
+
+volumes:
+  app-src:
+    driver: local
+  db-data:
+    driver: local
+  redis-data:
+    driver: local
