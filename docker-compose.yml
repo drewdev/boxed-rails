@@ -35,7 +35,7 @@ services:
 
 volumes:
   app-src:
-    driver: local
+    external: true
   db-data:
     driver: local
   redis-data:
